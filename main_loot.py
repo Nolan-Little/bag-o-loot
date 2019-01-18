@@ -27,7 +27,6 @@ class Loot_bag:
             if child_id == None:
                  return self.create_child(child_name)
             else:
-                print(child_id[0])
                 return(child_id[0])
 
     def create_child(self, child_name):
