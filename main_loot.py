@@ -49,22 +49,26 @@ class Loot_bag:
             )
             return cursor.lastrowid
 
-    # def add_toy(toy_name):
-    #     with sqlite3.connect(loot_db) as conn:
-    #         cursor = conn.cursor()
+    def add_toy(self, child_name, toy_name):
+        """Adds a toy in the db
 
+        Arguments:
+            child_name {string} -- Name of child that the toy is for
+            toy_name {string} -- name of toy
+        """
 
+        with sqlite3.connect(loot_db) as conn:
+            cursor = conn.cursor()
 
-            # try:
-            #     cursor.execute(
-            #         '''
-            #         INSERT INTO Superheroes
-            #         VALUES(?, ?, ?, ?)
-            #         ''', (None, toy_name, , super_hero["secret"], super_hero["color"])
-            #     )
-            # except sqlite3.OperationalError as err:
-            #     print("error:", err)
+            child_id = self.find_child(child_name)
+            cursor.execute(
+                '''
+                INSERT INTO Toys
+                VALUES(?, ?, ?, ?)
+                ''', (None, toy_name, child_id, 0)
+            )
+
 
 if __name__ == "__main__":
     loot = Loot_bag()
-    loot.find_child('Leylsel')
+    loot.add_toy('Goony', 'basket')
