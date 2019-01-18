@@ -1,6 +1,7 @@
 import sqlite3
 import sys
 from io import StringIO
+import subprocess
 
 # sys.argv is a list of the passed in args from the command line
 
@@ -23,13 +24,6 @@ class Loot_bag:
             cursor.executescript(tempfile.read())
             return cursor
 
-        # try:
-        #     conn = sqlite3.connect(':memory:')
-        #     print(sqlite3.version)
-        # except Error as e:
-        #     print(e)
-        # finally:
-        #     conn.close()
 
     def find_child(self, child_name):
         """checks the db to see if child exists, if child doesn't exist it creates the child in the db.
@@ -90,4 +84,16 @@ class Loot_bag:
 
 if __name__ == "__main__":
     l = Loot_bag()
-    print(l.find_child(''))
+    if sys.argv[1] == "test":
+        print("testing")
+        command = 'cd test; python -m unittest -v; cd ..'
+        process = subprocess.Popen(command, shell=True)
+    elif sys.argv[1] == 'add':
+        l.add_toy(sys.argv[2], sys.argv[3])
+
+
+
+        # subprocess.run(["cd", "test", "&&", "python", "-m", "unittest", "-v", "cd", ".."])
+
+
+

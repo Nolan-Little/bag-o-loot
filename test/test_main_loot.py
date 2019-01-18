@@ -26,6 +26,7 @@ class TestLootBag(unittest.TestCase):
     def test_find_child(self):
         child_name = 'Billy'
         child_id = 1
+        print("WTF")
         self.assertEqual(self.Loot.find_child(child_name), child_id)
 
     def test_create_child(self):
