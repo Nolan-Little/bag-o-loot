@@ -42,12 +42,11 @@ class Loot_bag:
         def select_child(child_name, cursor):
             cursor.execute(f'''SELECT c.ChildId
                 FROM Children c
-                WHERE c.Name = '{child_name}' ''')
+                WHERE c.Name LIKE '{child_name}' ''')
             child_id = cursor.fetchone()
             if child_id == None:
                 return self.create_child(child_name)
             else:
-                print(child_id[0])
                 return(child_id[0])
 
         if cursor == None:
@@ -74,7 +73,6 @@ class Loot_bag:
                 VALUES (?, ?)
                 ''', (None, child_name)
             )
-            print(cursor.lastrowid)
             return cursor.lastrowid
 
         if cursor == None:
@@ -223,14 +221,15 @@ if __name__ == "__main__":
             l.print_help()
 
         elif sys.argv[1] == 'add':
-            print("add toy", sys.argv[2], sys.argv[3])
+            print(f"added a {sys.argv[2]} to the bag for {sys.argv[3]}")
             l.add_toy(sys.argv[2], sys.argv[3])
 
         elif sys.argv[1] == 'remove':
-            print(f"remove {sys.argv[3]} for {sys.argv[2]}")
+            print(f"removed {sys.argv[3]} that was for {sys.argv[2]}")
             l.remove_toy(sys.argv[2], sys.argv[3])
 
         elif sys.argv[1] == 'ls' and len(sys.argv) == 3:
+            print(f"{sys.argv[2]}'s toys:")
             l.list_child(sys.argv[2])
 
         elif sys.argv[1] == 'ls':
