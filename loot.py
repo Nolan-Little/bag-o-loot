@@ -16,23 +16,23 @@ class Loot_bag:
         Welcome to Bag O' Loot,
         A delivery tracking app
 
-        add: adds a toy for a child,
+           add: adds a toy for a child,
                 format as "add toy child"
 
         remove: removes a toy from bag,
                 format as "remove child toy"
-                'remove delivered' will remove all toys marked as delivered
+                "remove delivered" will remove all toys marked as delivered
 
-        ls: list all toys in the bag for all children
-            format as "ls child" to see the toys for a specific child
+            ls: list all toys in the bag for all children
+                format as "ls child" to see the toys for a specific child
 
-        delivered: mark a child's toys as delivered
-            format as "delivered child"
+     delivered: mark a child's toys as delivered
+                format as "delivered child"
         ''')
 
 
     def find_child(self, child_name, cursor=None):
-        """checks the db to see if child exists, if child doesn't exist it creates the child in the db.
+        """Checks the db to see if child exists, if child doesn't exist it creates the child in the db.
 
         Arguments:
             child_name {string} -- first name of a child
@@ -60,7 +60,7 @@ class Loot_bag:
 
 
     def create_child(self, child_name, cursor=None):
-        """creates a child in the db
+        """Creates a child in the db
 
         Arguments:
             child_name {string} -- the first name of a child
