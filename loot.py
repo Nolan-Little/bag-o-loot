@@ -21,6 +21,7 @@ class Loot_bag:
 
         remove: removes a toy from bag,
                 format as "remove child toy"
+                'remove delivered' will remove all toys marked as delivered
 
         ls: list all toys in the bag for all children
             format as "ls child" to see the toys for a specific child
@@ -120,7 +121,7 @@ class Loot_bag:
 	            WHERE c.Name Like '{child_name}'
                 ) AND Toys.name LIKE '{toy_name}'
                 '''
-            )
+                )
 
         if cursor == None:
             with sqlite3.connect(self.db) as conn:
@@ -129,6 +130,25 @@ class Loot_bag:
 
         else:
             return delete_toy(child_name, toy_name,cursor)
+
+
+    def remove_delivered(self, cursor = None):
+
+        def delete_delivered(self, cursor):
+            cursor.execute(
+                f'''
+                DELETE FROM Toys
+                WHERE Toys.delivered = 1
+                '''
+                )
+
+        if cursor == None:
+            with sqlite3.connect(self.db) as conn:
+                cursor = conn.cursor()
+                delete_delivered(self, cursor)
+
+        else:
+            return delete_delivered(self, cursor)
 
 
     def list_toys(self, cursor = None):
@@ -236,6 +256,10 @@ if __name__ == "__main__":
         elif sys.argv[1] == 'add':
             l.add_toy(sys.argv[2], sys.argv[3])
             print(f"added a {sys.argv[2]} to the bag for {sys.argv[3]}")
+
+        elif sys.argv[1] == 'remove' and len(sys.argv) == 3:
+            l.remove_delivered()
+            print("Removed all toys marked as 'delivered' from the bag.")
 
         elif sys.argv[1] == 'remove':
             l.remove_toy(sys.argv[2], sys.argv[3])
