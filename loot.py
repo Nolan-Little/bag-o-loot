@@ -147,13 +147,12 @@ class Loot_bag:
             with sqlite3.connect(self.db) as conn:
                 cursor = conn.cursor()
                 select_toys(self, cursor)
-                result = cursor.fetchall()
-                for child in result:
-                    print(f'{child[0]}: {child[1]}')
+                return cursor.fetchall()
+
 
         else:
             select_toys(self, cursor)
-            print(cursor.fetchall())
+            return cursor.fetchall()
 
 
     def list_child(self, child_name,  cursor = None):
@@ -172,12 +171,12 @@ class Loot_bag:
             with sqlite3.connect(self.db) as conn:
                 cursor = conn.cursor()
                 select_child_toys(self, child_name, cursor)
-                result = cursor.fetchall()
-                print(f'{result[0][0]}: {result[0][1]}')
+                return cursor.fetchall()
+
 
         else:
             select_child_toys(self, child_name, cursor)
-            print(cursor.fetchall())
+            return cursor.fetchall()
 
 
     def deliver_toys(self, child_name, cursor = None):
@@ -199,12 +198,11 @@ class Loot_bag:
             with sqlite3.connect(self.db) as conn:
                 cursor = conn.cursor()
                 update_toys(self, child_name, cursor)
-                result = cursor.fetchall()
-                print(f"delivered {child_name}'s toys!")
+                return cursor.lastrowid
 
         else:
             update_toys(self, child_name, cursor)
-            print(cursor.fetchall())
+            return cursor.lastrowid
 
 
 if __name__ == "__main__":
@@ -221,23 +219,26 @@ if __name__ == "__main__":
             l.print_help()
 
         elif sys.argv[1] == 'add':
-            print(f"added a {sys.argv[2]} to the bag for {sys.argv[3]}")
             l.add_toy(sys.argv[2], sys.argv[3])
+            print(f"added a {sys.argv[2]} to the bag for {sys.argv[3]}")
 
         elif sys.argv[1] == 'remove':
-            print(f"removed {sys.argv[3]} that was for {sys.argv[2]}")
             l.remove_toy(sys.argv[2], sys.argv[3])
+            print(f"removed {sys.argv[3]} that was for {sys.argv[2]}")
 
         elif sys.argv[1] == 'ls' and len(sys.argv) == 3:
+            child = l.list_child(sys.argv[2])
             print(f"{sys.argv[2]}'s toys:")
-            l.list_child(sys.argv[2])
+            print(f'{child[0][0]}: {child[0][1]}')
 
         elif sys.argv[1] == 'ls':
-            l.list_toys()
+            toys = l.list_toys()
+            for child in toys:
+                print(f'{child[0]}: {child[1]}')
 
         elif sys.argv[1] == 'delivered':
             l.deliver_toys(sys.argv[2])
-
+            print(f"delivered {sys.argv[2]}'s toys!")
 
         else:
-            print(f"sorry,{sys.argv[1]} not a valid command. Try 'help' to see commands")
+            print(f"sorry,{sys.argv[1]} is not a valid command. Try 'help' to see commands")
