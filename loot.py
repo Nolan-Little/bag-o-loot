@@ -1,4 +1,4 @@
-import sqlite3
+
 import sqlite3
 import sys
 import subprocess
@@ -9,6 +9,26 @@ import subprocess
 class Loot_bag:
     def __init__(self):
         self.db = '/Users/nolanlittle/workspace/python/exercises/bag_o_loot/loot_prod_db'
+
+
+    def print_help(self):
+        print(f'''
+        Welcome to Bag O' Loot,
+        A delivery tracking app
+
+        add: adds a toy for a child,
+                format as "add toy child"
+
+        remove: removes a toy from bag,
+                format as "remove child toy"
+
+        ls: list all toys in the bag for all children
+            format as "ls child" to see the toys for a specific child
+
+        delivered: mark a child's toys as delivered
+            format as "delivered child"
+        ''')
+
 
     def find_child(self, child_name, cursor=None):
         """checks the db to see if child exists, if child doesn't exist it creates the child in the db.
@@ -38,6 +58,7 @@ class Loot_bag:
         else:
             return select_child(child_name, cursor)
 
+
     def create_child(self, child_name, cursor=None):
         """creates a child in the db
 
@@ -64,6 +85,7 @@ class Loot_bag:
         else:
             return insert_child(child_name, cursor)
 
+
     def add_toy(self, toy_name, child_name, cursor=None):
         """Adds a toy in the db
 
@@ -86,6 +108,7 @@ class Loot_bag:
                 return insert_toy(toy_name, child_name, cursor)
         else:
             return insert_toy(toy_name, child_name, cursor)
+
 
     def remove_toy(self, child_name, toy_name, cursor=None):
 
@@ -135,28 +158,87 @@ class Loot_bag:
             print(cursor.fetchall())
 
 
+    def list_child(self, child_name,  cursor = None):
+
+        def select_child_toys(self, child_name, cursor):
+            cursor.execute(
+                f'''
+                SELECT c.Name, group_concat(t.Name, ', ') FROM Children c
+                INNER JOIN Toys t
+                ON t.ChildId = c.ChildId
+                WHERE c.Name LIKE '{child_name}'
+                '''
+            )
+
+        if cursor == None:
+            with sqlite3.connect(self.db) as conn:
+                cursor = conn.cursor()
+                select_child_toys(self, child_name, cursor)
+                result = cursor.fetchall()
+                print(f'{result[0][0]}: {result[0][1]}')
+
+        else:
+            select_child_toys(self, child_name, cursor)
+            print(cursor.fetchall())
+
+
+    def deliver_toys(self, child_name, cursor = None):
+
+        def update_toys(self, child_name, cursor):
+            cursor.execute(
+                f'''
+                UPDATE Toys
+                SET Delivered = 1
+                WHERE Toys.ChildId IN (
+                SELECT t.ChildId FROM Toys t
+                LEFT JOIN Children c ON c.ChildId = t.ChildId
+                WHERE c.Name LIKE '{child_name}'
+                )
+                '''
+            )
+
+        if cursor == None:
+            with sqlite3.connect(self.db) as conn:
+                cursor = conn.cursor()
+                update_toys(self, child_name, cursor)
+                result = cursor.fetchall()
+                print(f"delivered {child_name}'s toys!")
+
+        else:
+            update_toys(self, child_name, cursor)
+            print(cursor.fetchall())
+
+
 if __name__ == "__main__":
     l = Loot_bag()
-    if sys.argv[1] == "test":
+    if len(sys.argv) < 2:
+        l.print_help()
+    elif sys.argv[1] == "test":
         print("testing")
         command = 'cd test; python -m unittest -v; cd ..'
         process = subprocess.Popen(command, shell=True)
     else:
 
-        if sys.argv[1] == 'find':
-            print("find child")
-            l.find_child(sys.argv[2])
+        if sys.argv[1] == 'help':
+            l.print_help()
 
-        if sys.argv[1] == 'add':
+        elif sys.argv[1] == 'add':
             print("add toy", sys.argv[2], sys.argv[3])
             l.add_toy(sys.argv[2], sys.argv[3])
 
-        if sys.argv[1] == 'remove':
+        elif sys.argv[1] == 'remove':
             print(f"remove {sys.argv[3]} for {sys.argv[2]}")
             l.remove_toy(sys.argv[2], sys.argv[3])
 
-        if sys.argv[1] == 'ls':
+        elif sys.argv[1] == 'ls' and len(sys.argv) == 3:
+            l.list_child(sys.argv[2])
+
+        elif sys.argv[1] == 'ls':
             l.list_toys()
 
+        elif sys.argv[1] == 'delivered':
+            l.deliver_toys(sys.argv[2])
+
+
         else:
-            print(f"sorry,{sys.argv[1]} not a valid command")
+            print(f"sorry,{sys.argv[1]} not a valid command. Try 'help' to see commands")
