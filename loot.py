@@ -136,9 +136,9 @@ class Loot_bag:
         def select_toys(self, cursor):
             cursor.execute(
                 '''
-                SELECT c.Name as child_name, group_concat(t.Name, ', ') as toys from Toys t
+                SELECT c.Name as child_name, group_concat(t.Name, ', ') as toys, t.Delivered
+                FROM Toys t
                 INNER JOIN Children c ON c.childId = t.childId
-                WHERE t.delivered != 1
                 GROUP BY c.Name
                 '''
             )
@@ -160,7 +160,8 @@ class Loot_bag:
         def select_child_toys(self, child_name, cursor):
             cursor.execute(
                 f'''
-                SELECT c.Name, group_concat(t.Name, ', ') FROM Children c
+                SELECT c.Name, group_concat(t.Name, ', '), t.Delivered
+                FROM Children c
                 INNER JOIN Toys t
                 ON t.ChildId = c.ChildId
                 WHERE c.Name LIKE '{child_name}'
@@ -205,6 +206,20 @@ class Loot_bag:
             return cursor.lastrowid
 
 
+    def print_toys(self, child):
+        if len(child) ==1:
+            if child[0][2] ==1:
+                print(f'{child[0][0]}: {child[0][1]}(delivered)')
+            else:
+                print(f'{child[0][0]}: {child[0][1]}')
+
+        elif child[2] == 1:
+            print(f'{child[0]}: {child[1]}(delivered)')
+        else:
+            print(f'{child[0]}: {child[1]}')
+
+
+
 if __name__ == "__main__":
     l = Loot_bag()
     if len(sys.argv) < 2:
@@ -229,12 +244,12 @@ if __name__ == "__main__":
         elif sys.argv[1] == 'ls' and len(sys.argv) == 3:
             child = l.list_child(sys.argv[2])
             print(f"{sys.argv[2]}'s toys:")
-            print(f'{child[0][0]}: {child[0][1]}')
+            l.print_toys(child)
 
         elif sys.argv[1] == 'ls':
-            toys = l.list_toys()
-            for child in toys:
-                print(f'{child[0]}: {child[1]}')
+            result = l.list_toys()
+            for child in result:
+                l.print_toys(child)
 
         elif sys.argv[1] == 'delivered':
             l.deliver_toys(sys.argv[2])
